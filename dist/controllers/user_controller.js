@@ -1,62 +1,96 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteUser = exports.putUser = exports.getUserById = exports.getUserAPIInfo = exports.createUser = void 0;
-const client_1 = require("@prisma/client");
-const prisma = new client_1.PrismaClient();
-const createUser = async (req, res, next) => {
-    const user = await prisma.user.create({
-        data: {
-            name: "Alice",
-            email: "alice@example.com",
-        },
+exports.deleteUser = exports.putUser = exports.getUserById = exports.getUsers = exports.createUser = void 0;
+const db_1 = __importDefault(require("../db"));
+const createUser = (req, res, next) => {
+    const name = req.name;
+    db_1.default.query("INSERT INTO users (name) VALUES (?)", [name], (error, results) => {
+        if (error) {
+            return res
+                .status(500)
+                .json({ message: "データベースのクエリ中にエラーが発生しました。" });
+        }
+        res.json({ message: "ユーザー作成成功" });
     });
-    console.log(user);
 };
 exports.createUser = createUser;
 // User APIの基本情報を返す関数
-const getUserAPIInfo = async (req, res, next) => {
-    const users = await prisma.user.findMany();
-    console.log(users);
-};
-exports.getUserAPIInfo = getUserAPIInfo;
-// 特定のユーザー情報を返す関数
-const getUserById = async (req, res, next) => {
+const getUsers = (req, res, next) => {
     try {
-        const user = await prisma.user.findUnique({
-            where: {
-                id: Number(req.params.id),
-            },
+        db_1.default.query("SELECT * FROM users", (error, results) => {
+            if (error) {
+                return res
+                    .status(500)
+                    .json({ message: "データベースのクエリ中にエラーが発生しました。" });
+            }
+            res.json(results);
         });
-        if (user) {
-            res.json(user);
-        }
-        else {
-            res.status(404).json({ message: "ユーザーが見つかりません。" });
-        }
     }
     catch (error) {
-        next(error);
+        res.status(500).json({ message: "内部サーバーエラー" });
+    }
+};
+exports.getUsers = getUsers;
+// 特定のユーザー情報を返す関数
+const getUserById = (req, res, next) => {
+    try {
+        const userId = req.params.id;
+        db_1.default.query("SELECT * FROM users WHERE id = ?", [userId], (error, results) => {
+            if (error) {
+                return res.status(500).json({
+                    message: "データベースのクエリ中にエラーが発生しました。",
+                });
+            }
+            if (results.length === 0) {
+                return res
+                    .status(404)
+                    .json({ message: "指定されたIDのユーザーが見つかりません。" });
+            }
+            res.json(results[0]);
+        });
+    }
+    catch (error) {
+        res.status(500).json({ message: "内部サーバーエラー" });
     }
 };
 exports.getUserById = getUserById;
-const putUser = async (req, res, next) => {
-    const user = await prisma.user.update({
-        where: {
-            email: "alice@example.com",
-        },
-        data: {
-            name: "Alice Smith",
-        },
-    });
-    console.log(user);
+const putUser = (req, res, next) => {
+    try {
+        const userId = req.params.id;
+        const name = req.body.name;
+        db_1.default.query("UPDATE users SET name = ? WHERE id = ?", [name, userId], (error, results) => {
+            if (error) {
+                return res
+                    .status(500)
+                    .json({
+                    message: "データベースのクエリ中にエラーが発生しました。",
+                });
+            }
+            res.json({ message: "ユーザー更新成功" });
+        });
+    }
+    catch (error) {
+        res.status(500).json({ message: "内部サーバーエラー" });
+    }
 };
 exports.putUser = putUser;
-const deleteUser = async (req, res, next) => {
-    const user = await prisma.user.delete({
-        where: {
-            email: "alice@example.com",
-        },
-    });
-    console.log(user);
+const deleteUser = (req, res, next) => {
+    try {
+        const userId = req.params.id;
+        db_1.default.query("DELETE FROM users WHERE id = ?", [userId], (error, results) => {
+            if (error) {
+                return res
+                    .status(500)
+                    .json({ message: "データベースのクエリ中にエラーが発生しました。" });
+            }
+            res.json({ message: "ユーザー削除成功" });
+        });
+    }
+    catch (error) {
+        res.status(500).json({ message: "内部サーバーエラー" });
+    }
 };
 exports.deleteUser = deleteUser;

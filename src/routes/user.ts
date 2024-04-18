@@ -2,20 +2,32 @@ import { Router, Request, Response, NextFunction } from "express";
 
 import {
   createUser,
-  getUserAPIInfo,
+  getUsers,
   getUserById,
   putUser,
   deleteUser,
 } from "../controllers/user_controller";
 
+import { User } from "../utils/constants";
+
 const router = Router();
 
 router.post("/", (req: Request, res: Response, next: NextFunction) => {
-  createUser(req, res, next);
+  const user: User = {
+    id: req.body.id,
+    name: req.body.name,
+  };
+
+  createUser(user, res, next);
 });
 
 router.get("/", (req: Request, res: Response, next: NextFunction) => {
-  getUserAPIInfo(req, res, next);
+  const user: User = {
+    id: req.body.id,
+    name: req.body.name,
+  };
+
+  getUsers(user, res, next);
 });
 
 router.get("/:id", (req: Request, res: Response, next: NextFunction) => {

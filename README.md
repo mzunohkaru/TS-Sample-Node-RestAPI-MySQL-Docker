@@ -11,5 +11,3 @@ $ docker-compose build --no-cache && docker-compose up
 
 ## データベース (MySQL) へのアクセス
 $ docker-compose exec mysql mysql -uuser -ppassword dev
-
-$ npx prisma generate

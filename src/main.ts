@@ -37,4 +37,3 @@ function errorHandler(err: Error, req: Request, res: Response, next: NextFunctio
   console.error(err.stack);
   res.status(500).send("何か問題が発生しました!");
 }
-
