@@ -62,10 +62,10 @@ const getUserById = (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-const putUser = (req: Request, res: Response, next: NextFunction) => {
+const putUser = (req: User, res: Response, next: NextFunction) => {
   try {
-    const userId = req.params.id;
-    const name = req.body.name;
+    const userId = req.id;
+    const name = req.name;
     pool.query(
       "UPDATE users SET name = ? WHERE id = ?",
       [name, userId],
@@ -85,9 +85,9 @@ const putUser = (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-const deleteUser = (req: Request, res: Response, next: NextFunction) => {
+const deleteUser = (req: User, res: Response, next: NextFunction) => {
   try {
-    const userId = req.params.id;
+    const userId = req.id;
     pool.query("DELETE FROM users WHERE id = ?", [userId], (error, results) => {
       if (error) {
         return res
