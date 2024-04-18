@@ -1,0 +1,49 @@
+openapi: 3.0.0
+info:
+  title: Basic API
+  version: 1.0.0
+  description: このAPIは基本的な機能を提供します。
+servers:
+  - url: http://localhost:3000
+    description: 開発サーバー
+paths:
+  /api:
+    get:
+      summary: 基本的なAPIレスポンスを取得
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/js∏on:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Basic API
+  /error:
+    get:
+      summary: エラーを発生させる
+      responses:
+        '500':
+          description: サーバーエラー
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: 何か問題が発生しました!
+components:
+  responses:
+    BadRequest:
+      description: 不正なリクエスト
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  schemas:
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+          example: 不正なリクエストです。
