@@ -5,7 +5,7 @@ const user_controller_1 = require("../controllers/user_controller");
 const user_1 = require("../middleware/user");
 const authCheck_1 = require("../middleware/authCheck");
 const router = (0, express_1.Router)();
-router.post("/", user_1.userMiddleware, authCheck_1.authCheck, (req, res, next) => {
+router.post("/", user_1.userMiddleware, (req, res, next) => {
     (0, user_controller_1.createUser)(req.body, res, next);
 });
 router.post("/login", user_1.userMiddleware, (req, res, next) => {

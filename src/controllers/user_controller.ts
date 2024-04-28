@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { sign } from "jsonwebtoken";
 
 import { User } from "../utils/constants";
+import { hashPassword, verifyPassword } from "./hash_controller";
 
 import pool from "../db";
 
@@ -9,11 +10,11 @@ const createUser = async (req: User, res: Response, next: NextFunction) => {
   const name = req.name;
   const email = req.email;
   const password = req.password;
-  // const hashedPassword = await hashPassword(password);
+  const hashedPassword = await hashPassword(password);
 
   pool.query(
     "INSERT INTO users (name, email, password) VALUES (?, ?, ?)",
-    [name, email, password],
+    [name, email, hashedPassword],
     (error, results) => {
       if (error) {
         return res
@@ -39,7 +40,9 @@ const loginUser = async (req: User, res: Response, next: NextFunction) => {
             message: "データベースのクエリ中にエラーが発生しました。",
           });
         }
-        if (results[0].password === password) {
+        const verify = await verifyPassword(password, results[0].password);
+
+        if (verify) {
           // トークン発行
           const jwtPayload = {
             id: results[0].id,

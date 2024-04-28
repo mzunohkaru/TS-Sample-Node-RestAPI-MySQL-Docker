@@ -5,13 +5,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteUser = exports.putUserEmail = exports.putUserName = exports.getUserById = exports.getUsers = exports.loginUser = exports.createUser = void 0;
 const jsonwebtoken_1 = require("jsonwebtoken");
+const hash_controller_1 = require("./hash_controller");
 const db_1 = __importDefault(require("../db"));
 const createUser = async (req, res, next) => {
     const name = req.name;
     const email = req.email;
     const password = req.password;
-    // const hashedPassword = await hashPassword(password);
-    db_1.default.query("INSERT INTO users (name, email, password) VALUES (?, ?, ?)", [name, email, password], (error, results) => {
+    const hashedPassword = await (0, hash_controller_1.hashPassword)(password);
+    db_1.default.query("INSERT INTO users (name, email, password) VALUES (?, ?, ?)", [name, email, hashedPassword], (error, results) => {
         if (error) {
             return res
                 .status(500)
@@ -31,7 +32,8 @@ const loginUser = async (req, res, next) => {
                     message: "データベースのクエリ中にエラーが発生しました。",
                 });
             }
-            if (results[0].password === password) {
+            const verify = await (0, hash_controller_1.verifyPassword)(password, results[0].password);
+            if (verify) {
                 // トークン発行
                 const jwtPayload = {
                     id: results[0].id,

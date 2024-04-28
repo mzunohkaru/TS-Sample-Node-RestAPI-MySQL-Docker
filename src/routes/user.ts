@@ -15,7 +15,7 @@ import { authCheck } from "../middleware/authCheck";
 
 const router = Router();
 
-router.post("/", userMiddleware, authCheck, (req: Request, res: Response, next: NextFunction) => {
+router.post("/", userMiddleware, (req: Request, res: Response, next: NextFunction) => {
   createUser(req.body, res, next);
 });
 
