@@ -33,7 +33,13 @@ app.listen(PORT, () => {
   console.log(`Server is running! http://localhost:${PORT}`);
 });
 
-function errorHandler(err: Error, req: Request, res: Response, next: NextFunction) {
+function errorHandler(
+  err: Error,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
   console.error(err.stack);
   res.status(500).send("何か問題が発生しました!");
 }
+

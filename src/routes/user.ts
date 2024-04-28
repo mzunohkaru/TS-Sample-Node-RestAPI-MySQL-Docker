@@ -2,54 +2,45 @@ import { Router, Request, Response, NextFunction } from "express";
 
 import {
   createUser,
+  loginUser,
   getUsers,
   getUserById,
-  putUser,
+  putUserName,
+  putUserEmail,
   deleteUser,
 } from "../controllers/user_controller";
 
-import { User } from "../utils/constants";
+import { userMiddleware } from "../middleware/user";
+import { authCheck } from "../middleware/authCheck";
 
 const router = Router();
 
-router.post("/", (req: Request, res: Response, next: NextFunction) => {
-  const user: User = {
-    id: req.params.id,
-    name: req.body.name,
-  };
-
-  createUser(user, res, next);
+router.post("/", userMiddleware, authCheck, (req: Request, res: Response, next: NextFunction) => {
+  createUser(req.body, res, next);
 });
 
-router.get("/", (req: Request, res: Response, next: NextFunction) => {
-  const user: User = {
-    id: req.params.id,
-    name: req.body.name,
-  };
+router.post("/login", userMiddleware, (req: Request, res: Response, next: NextFunction) => {
+  loginUser(req.body, res, next);
+});
 
-  getUsers(user, res, next);
+router.get("/", userMiddleware, (req: Request, res: Response, next: NextFunction) => {
+  getUsers(req.body, res, next);
 });
 
 router.get("/:id", (req: Request, res: Response, next: NextFunction) => {
   getUserById(req, res, next);
 });
 
-router.put("/:id", (req: Request, res: Response, next: NextFunction) => {
-  const user: User = {
-    id: req.params.id,
-    name: req.body.name,
-  };
-
-  putUser(user, res, next);
+router.put("/name/:id", authCheck, (req: Request, res: Response, next: NextFunction) => {
+  putUserName(req, res, next);
 });
 
-router.delete("/:id", (req: Request, res: Response, next: NextFunction) => {
-  const user: User = {
-    id: req.params.id,
-    name: req.body.name,
-  };
+router.put("/email/:id", authCheck, (req: Request, res: Response, next: NextFunction) => {
+  putUserEmail(req, res, next);
+});
 
-  deleteUser(user, res, next);
+router.delete("/:id", authCheck, (req: Request, res: Response, next: NextFunction) => {
+  deleteUser(req.body, res, next);
 });
 
 export default router;
